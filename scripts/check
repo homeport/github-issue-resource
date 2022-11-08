@@ -1,0 +1,54 @@
+#!/bin/bash
+#
+# MIT License
+#
+# Copyright (c) 2022 The Homeport Team
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+set -euo pipefail
+
+CONFIG="$(cat)"
+echo >&2 -e "\\033[1mConfig\\033[0m:\n$(jq -C '.source.token="***"' <<<"${CONFIG}")"
+
+HOSTNAME="$(jq --raw-output '.source.hostname // ""' <<<"${CONFIG}")"
+if [[ -z $HOSTNAME ]]; then
+  echo >&2 "No hostname specified: Use .source.hostname to define the hostname to be used"
+  exit 1
+fi
+
+TOKEN="$(jq --raw-output '.source.token // ""' <<<"${CONFIG}")"
+if [[ -z $TOKEN ]]; then
+  echo >&2 "No token specified: Use .source.token to define the token to be used"
+  exit 1
+fi
+
+REPOSITORY="$(jq --raw-output '.source.repository // ""' <<<"${CONFIG}")"
+if [[ -z $REPOSITORY ]]; then
+  echo >&2 "No repository specified: Use .source.repository to define the repository to be used"
+  exit 1
+fi
+
+export GH_HOST="$HOSTNAME"
+gh auth login --hostname "$HOSTNAME" --with-token <<<"${TOKEN}" >&2
+gh --repo "$HOSTNAME/$REPOSITORY" \
+  issue list \
+  --limit 1024 \
+  --json number |
+  jq '[ sort_by(.number)[] | { "ref": .number | tostring } ]'
