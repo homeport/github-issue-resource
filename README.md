@@ -14,12 +14,25 @@ _Note:_ Currently, only checking and using it for `get` steps is supported.
 
 ### Example
 
+Since it is a custom resource type, it has to be configured once in the pipeline configuration.
+
+```yaml
+resource_types:
+- name: github-issue-resource
+  type: docker-image
+  source:
+   repository: ghcr.io/homeport/github-issue-resource
+   tag: latest
+```
+
+One example would be to trigger a job, if a new issue was opened in a repository.
+
 ``` yaml
 resources:
 - name: repo-issue
   type: github-issue-resource
   check_every: 2h
-  icon: github
+  icon: alert-circle-outline
   source:
     hostname: github.com
     token: ((github-access-token))
