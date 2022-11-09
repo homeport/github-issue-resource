@@ -24,7 +24,4 @@
 
 set -euo pipefail
 
-CONFIG="$(cat)"
-echo >&2 -e "\\033[1mConfig\\033[0m:\n$(jq -C '.source.token="***"' <<<"${CONFIG}")"
-
-echo "{}"
+echo >&2 "out is not implemented"
