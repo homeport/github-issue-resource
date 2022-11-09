@@ -20,24 +20,27 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-FROM registry.access.redhat.com/ubi9-minimal:latest
-RUN \
-  microdnf update \
-    --assumeyes \
-    --nodocs && \
-  microdnf install \
-    --assumeyes \
-    --nodocs \
-    --noplugins \
-    jq \
-    tar \
-    gzip && \
-  microdnf clean all && \
-  rm -rf /var/cache/yum
-
+FROM registry.access.redhat.com/ubi9-minimal:latest as bootstrap
+RUN microdnf install --assumeyes jq tar gzip
 RUN GHCLI_VERSION="$(curl --silent --fail --location https://api.github.com/repos/cli/cli/releases | jq --raw-output '.[0].tag_name')" && \
   curl --fail --silent --location https://github.com/cli/cli/releases/download/${GHCLI_VERSION}/gh_${GHCLI_VERSION//v/}_linux_amd64.tar.gz | tar -xzf - -C /tmp "gh_${GHCLI_VERSION//v/}_linux_amd64/bin/gh" && \
   mv "/tmp/gh_${GHCLI_VERSION//v/}_linux_amd64/bin/gh" /usr/local/bin && \
   rm -rf "/tmp/gh_${GHCLI_VERSION//v/}_linux_amd64"
 
+
+FROM registry.access.redhat.com/ubi9-minimal:latest
+RUN \
+  microdnf update \
+    --assumeyes \
+    --nodocs \
+    --noplugins && \
+  microdnf install \
+    --assumeyes \
+    --nodocs \
+    --noplugins \
+    jq && \
+  microdnf clean all && \
+  rm -rf /var/cache/yum
+
+COPY --from=bootstrap /usr/local/bin /usr/local/bin
 COPY scripts/check scripts/out scripts/in /opt/resource/
