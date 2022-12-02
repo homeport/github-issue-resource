@@ -51,4 +51,4 @@ gh --repo "$HOSTNAME/$REPOSITORY" \
   issue list \
   --limit 1024 \
   --json number |
-  jq '[ sort_by(.number)[] | { "ref": .number | tostring } ]'
+  jq '[ sort_by(.number)[] | { "issue": .number | tostring } ]'

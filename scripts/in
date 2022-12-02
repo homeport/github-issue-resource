@@ -30,14 +30,14 @@ echo >&2 -e "\\033[1mConfig\\033[0m: $(jq -c -C '.source.token="***"' <<<"${CONF
 HOSTNAME="$(jq --raw-output '.source.hostname // ""' <<<"${CONFIG}")"
 TOKEN="$(jq --raw-output '.source.token // ""' <<<"${CONFIG}")"
 REPOSITORY="$(jq --raw-output '.source.repository // ""' <<<"${CONFIG}")"
-NUMBER="$(jq --raw-output '.version.ref // ""' <<<"${CONFIG}")"
+NUMBER="$(jq --raw-output '.version.issue // ""' <<<"${CONFIG}")"
 
 export GH_HOST="$HOSTNAME"
 gh auth login --hostname "$HOSTNAME" --with-token <<<"${TOKEN}" >&2
 jq . <<EOF
 {
   "version": {
-    "ref": "$NUMBER"
+    "issue": "$NUMBER"
   },
   "metadata": $(gh --repo "$HOSTNAME/$REPOSITORY" issue view "$NUMBER" --json body,createdAt,number,state,title,updatedAt,url | jq '[ to_entries[] | { "name": .key, "value": .value | tostring } ]')
 }
