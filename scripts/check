@@ -25,7 +25,7 @@
 set -euo pipefail
 
 CONFIG="$(cat)"
-echo >&2 -e "\\033[1mConfig\\033[0m: $(jq -C '.source.token="***"' <<<"$CONFIG")"
+echo >&2 -e "\\033[1mConfig\\033[0m: $(jq -c -C '.source.token="***"' <<<"$CONFIG")"
 
 HOSTNAME="$(jq --raw-output '.source.hostname // ""' <<<"$CONFIG")"
 if [[ -z $HOSTNAME ]]; then
