@@ -12,6 +12,8 @@ _Note:_ Currently, only checking and using it for `get` steps is supported.
 
 * `repository`: _Required._ The GitHub repository to work with, for example `homeport/github-issue-resource`.
 
+* `labels`: _Optional_ List of labels to use in the issue list filter.
+
 ### Example
 
 Since it is a custom resource type, it has to be configured once in the pipeline configuration.
@@ -37,6 +39,7 @@ resources:
     hostname: github.com
     token: ((github-access-token))
     repository: homeport/github-issue-resource
+    labels: ["foobar"]
 
 jobs:
 - name: some-job
