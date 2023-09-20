@@ -58,6 +58,6 @@ while IFS=$'\t' read -r LABEL; do
 done <<<"$(jq --raw-output '(.source.labels // [])[] | [.] | @tsv' <<<"$CONFIG")"
 
 export GH_HOST="$HOSTNAME"
-#gh auth login --hostname "$HOSTNAME" --with-token <<<"${TOKEN}" >&2
+gh auth login --hostname "$HOSTNAME" --with-token <<<"${TOKEN}" >&2
 gh --repo "$HOSTNAME/$REPOSITORY" issue list "${LIST_ARGS[@]}" |
   jq '[ sort_by(.number)[] | { "issue": .number | tostring } ]'
